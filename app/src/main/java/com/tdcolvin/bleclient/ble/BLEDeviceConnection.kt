@@ -1,5 +1,6 @@
 package com.tdcolvin.bleclient.ble
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -15,9 +16,8 @@ import java.util.UUID
 val CTF_SERVICE_UUID: UUID = UUID.fromString("8c380000-10bd-4fdb-ba21-1922d6cf860d")
 val PASSWORD_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380001-10bd-4fdb-ba21-1922d6cf860d")
 val NAME_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380002-10bd-4fdb-ba21-1922d6cf860d")
-
 @Suppress("DEPRECATION")
-class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") constructor(
+class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) constructor(
     private val context: Context,
     private val bluetoothDevice: BluetoothDevice
 ) {
@@ -40,6 +40,7 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
             services.value = gatt.services
+            Log.d("CUSTOM LOG", "@@@@@@@@@@@ $services.value")
         }
 
         @Deprecated("Deprecated in Java")
@@ -51,6 +52,8 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
             super.onCharacteristicRead(gatt, characteristic, status)
             if (characteristic.uuid == PASSWORD_CHARACTERISTIC_UUID) {
                 passwordRead.value = String(characteristic.value)
+                var my_pw = passwordRead.value
+                Log.d("CUSTOM LOG", "password: $my_pw")
             }
         }
 
@@ -59,6 +62,7 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
+            Log.d("Custom log", "@@@@ characteristic.toString(): $characteristic.toString()")
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (characteristic.uuid == NAME_CHARACTERISTIC_UUID) {
                 successfulNameWrites.update { it + 1 }

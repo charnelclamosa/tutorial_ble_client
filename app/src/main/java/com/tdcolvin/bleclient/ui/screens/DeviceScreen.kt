@@ -50,7 +50,7 @@ fun DeviceScreen(
                 }
             }
         }
-        Button(onClick = readPassword, enabled = isDeviceConnected && foundTargetService) {
+        Button(onClick = readPassword) {
             Text("3. Read Password")
         }
         if (password != null) {
