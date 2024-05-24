@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.tdcolvin.bleclient.ble.CTF_SERVICE_UUID
+import org.json.JSONObject
 
 @Composable
 fun DeviceScreen(
@@ -54,7 +55,8 @@ fun DeviceScreen(
             Text("3. Read Password")
         }
         if (password != null) {
-            Text("Found password: $password")
+            var json = JSONObject(password)
+            Text("Device information:\nDevice name: ${json.getString("device_name")}\nDevice model: ${json.getString("device_model")}\nBattery level: ${json.getString("battery_level")}")
         }
         Button(onClick = writeName, enabled = isDeviceConnected && foundTargetService) {
             Text("4. Write Your Name")

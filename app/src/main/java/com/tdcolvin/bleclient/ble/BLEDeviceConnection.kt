@@ -12,6 +12,7 @@ import androidx.annotation.RequiresPermission
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
+import org.json.JSONObject
 
 val CTF_SERVICE_UUID: UUID = UUID.fromString("8c380000-10bd-4fdb-ba21-1922d6cf860d")
 val PASSWORD_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380001-10bd-4fdb-ba21-1922d6cf860d")
@@ -53,7 +54,12 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
             if (characteristic.uuid == PASSWORD_CHARACTERISTIC_UUID) {
                 passwordRead.value = String(characteristic.value)
                 var my_pw = passwordRead.value
-                Log.d("CUSTOM LOG", "password: $my_pw")
+                var json = JSONObject(my_pw)
+//                Reference: https://sparkbyexamples.com/kotlin/how-to-parse-json-in-kotlin/
+                Log.d("CUSTOM LOG", "$my_pw")
+                Log.d("CUSTOM LOG", "device name: ${json.getString("device_name")}")
+                Log.d("CUSTOM LOG", "device model: ${json.getString("device_model")}")
+                Log.d("CUSTOM LOG", "battery level: ${json.getString("battery_level")}")
             }
         }
 
