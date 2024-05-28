@@ -26,7 +26,7 @@ fun DeviceScreen(
     nameWrittenTimes: Int,
     connect: () -> Unit,
     discoverServices: () -> Unit,
-    readPassword: () -> Unit,
+    displayDeviceInfo: () -> Unit,
     writeName: () -> Unit
 ) {
     val foundTargetService = discoveredCharacteristics.contains(CTF_SERVICE_UUID.toString())
@@ -35,11 +35,11 @@ fun DeviceScreen(
         Modifier.scrollable(rememberScrollState(), Orientation.Vertical)
     ) {
         Button(onClick = connect) {
-            Text("1. Connect")
+            Text("Connect")
         }
         Text("Device connected: $isDeviceConnected")
         Button(onClick = discoverServices, enabled = isDeviceConnected) {
-            Text("2. Discover Services")
+            Text("Discover Services")
         }
         LazyColumn {
             items(discoveredCharacteristics.keys.sorted()) { serviceUuid ->
@@ -51,21 +51,21 @@ fun DeviceScreen(
                 }
             }
         }
-        Button(onClick = readPassword) {
-            Text("3. Read Password")
+        Button(onClick = displayDeviceInfo, enabled = isDeviceConnected && foundTargetService) {
+            Text("Display device information")
         }
         if (password != null) {
             var json = JSONObject(password)
             Text("Device information:\nDevice name: ${json.getString("device_name")}\nDevice model: ${json.getString("device_model")}\nBattery level: ${json.getString("battery_level")}")
         }
-        Button(onClick = writeName, enabled = isDeviceConnected && foundTargetService) {
-            Text("4. Write Your Name")
-        }
-        if (nameWrittenTimes > 0) {
-            Text("Successful writes: $nameWrittenTimes")
-        }
+//        Button(onClick = writeName, enabled = isDeviceConnected && foundTargetService) {
+//            Text("4. Write Your Name")
+//        }
+//        if (nameWrittenTimes > 0) {
+//            Text("Successful writes: $nameWrittenTimes")
+//        }
 
-        OutlinedButton(modifier = Modifier.padding(top = 40.dp),  onClick = unselectDevice) {
+        OutlinedButton(modifier = Modifier.padding(top = 40.dp),  onClick = unselectDevice, enabled = isDeviceConnected) {
             Text("Disconnect")
         }
     }

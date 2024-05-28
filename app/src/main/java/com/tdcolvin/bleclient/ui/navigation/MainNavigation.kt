@@ -48,11 +48,11 @@ fun MainNavigation(viewModel: BLEClientViewModel = viewModel()) {
             },
             isDeviceConnected = uiState.isDeviceConnected,
             discoveredCharacteristics = uiState.discoveredCharacteristics,
-            password = uiState.password,
+            password = uiState.deviceInfo,
             nameWrittenTimes = uiState.nameWrittenTimes,
             connect = viewModel::connectActiveDevice,
             discoverServices = viewModel::discoverActiveDeviceServices,
-            readPassword = viewModel::readPasswordFromActiveDevice,
+            displayDeviceInfo = viewModel::readDeviceInfoFromActiveDevice,
             writeName = viewModel::writeNameToActiveDevice
         )
     }

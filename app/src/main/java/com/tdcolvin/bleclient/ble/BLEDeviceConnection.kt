@@ -15,7 +15,7 @@ import java.util.UUID
 import org.json.JSONObject
 
 val CTF_SERVICE_UUID: UUID = UUID.fromString("8c380000-10bd-4fdb-ba21-1922d6cf860d")
-val PASSWORD_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380001-10bd-4fdb-ba21-1922d6cf860d")
+val DEVICE_INFO_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380001-10bd-4fdb-ba21-1922d6cf860d")
 val NAME_CHARACTERISTIC_UUID: UUID = UUID.fromString("8c380002-10bd-4fdb-ba21-1922d6cf860d")
 @Suppress("DEPRECATION")
 class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) constructor(
@@ -23,7 +23,7 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
     private val bluetoothDevice: BluetoothDevice
 ) {
     val isConnected = MutableStateFlow(false)
-    val passwordRead = MutableStateFlow<String?>(null)
+    val deviceInfoRead = MutableStateFlow<String?>(null)
     val successfulNameWrites = MutableStateFlow(0)
     val services = MutableStateFlow<List<BluetoothGattService>>(emptyList())
 
@@ -41,7 +41,6 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             super.onServicesDiscovered(gatt, status)
             services.value = gatt.services
-            Log.d("CUSTOM LOG", "@@@@@@@@@@@ $services.value")
         }
 
         @Deprecated("Deprecated in Java")
@@ -51,12 +50,12 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
             status: Int
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
-            if (characteristic.uuid == PASSWORD_CHARACTERISTIC_UUID) {
-                passwordRead.value = String(characteristic.value)
-                var my_pw = passwordRead.value
-                var json = JSONObject(my_pw)
+            if (characteristic.uuid == DEVICE_INFO_CHARACTERISTIC_UUID) {
+                deviceInfoRead.value = String(characteristic.value)
+                var device_info = deviceInfoRead.value
+                var json = JSONObject(device_info)
 //                Reference: https://sparkbyexamples.com/kotlin/how-to-parse-json-in-kotlin/
-                Log.d("CUSTOM LOG", "$my_pw")
+                Log.d("CUSTOM LOG", "$device_info")
                 Log.d("CUSTOM LOG", "device name: ${json.getString("device_name")}")
                 Log.d("CUSTOM LOG", "device model: ${json.getString("device_model")}")
                 Log.d("CUSTOM LOG", "battery level: ${json.getString("battery_level")}")
@@ -68,7 +67,6 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
-            Log.d("Custom log", "@@@@ characteristic.toString(): $characteristic.toString()")
             super.onCharacteristicWrite(gatt, characteristic, status)
             if (characteristic.uuid == NAME_CHARACTERISTIC_UUID) {
                 successfulNameWrites.update { it + 1 }
@@ -96,9 +94,9 @@ class BLEDeviceConnection @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT) cons
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun readPassword() {
+    fun readDeviceInfo() {
         val service = gatt?.getService(CTF_SERVICE_UUID)
-        val characteristic = service?.getCharacteristic(PASSWORD_CHARACTERISTIC_UUID)
+        val characteristic = service?.getCharacteristic(DEVICE_INFO_CHARACTERISTIC_UUID)
         if (characteristic != null) {
             val success = gatt?.readCharacteristic(characteristic)
             Log.v("bluetooth", "Read status: $success")

@@ -33,8 +33,8 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
     private val activeDeviceServices = activeConnection.flatMapLatest {
         it?.services ?: flowOf(emptyList())
     }
-    private val activeDevicePassword = activeConnection.flatMapLatest {
-        it?.passwordRead ?: flowOf(null)
+    private val activeDeviceInfo = activeConnection.flatMapLatest {
+        it?.deviceInfoRead ?: flowOf(null)
     }
     private val activeDeviceNameWrittenTimes = activeConnection.flatMapLatest {
         it?.successfulNameWrites ?: flowOf(0)
@@ -45,13 +45,13 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
         _uiState,
         isDeviceConnected,
         activeDeviceServices,
-        activeDevicePassword,
+        activeDeviceInfo,
         activeDeviceNameWrittenTimes
-    ) { state, isDeviceConnected, services, password, nameWrittenTimes ->
+    ) { state, isDeviceConnected, services, deviceInfo, nameWrittenTimes ->
         state.copy(
             isDeviceConnected = isDeviceConnected,
             discoveredCharacteristics = services.associate { service -> Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() }) },
-            password = password,
+            deviceInfo = deviceInfo,
             nameWrittenTimes = nameWrittenTimes
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BLEClientUIState())
@@ -102,8 +102,8 @@ class BLEClientViewModel(private val application: Application): AndroidViewModel
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun readPasswordFromActiveDevice() {
-        activeConnection.value?.readPassword()
+    fun readDeviceInfoFromActiveDevice() {
+        activeConnection.value?.readDeviceInfo()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
@@ -133,6 +133,6 @@ data class BLEClientUIState(
     val activeDevice: BluetoothDevice? = null,
     val isDeviceConnected: Boolean = false,
     val discoveredCharacteristics: Map<String, List<String>> = emptyMap(),
-    val password: String? = null,
+    val deviceInfo: String? = null,
     val nameWrittenTimes: Int = 0
 )
