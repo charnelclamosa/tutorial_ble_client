@@ -22,7 +22,7 @@ fun DeviceScreen(
     unselectDevice: () -> Unit,
     isDeviceConnected: Boolean,
     discoveredCharacteristics: Map<String, List<String>>,
-    password: String?,
+    deviceInfo: String?,
     nameWrittenTimes: Int,
     connect: () -> Unit,
     discoverServices: () -> Unit,
@@ -54,8 +54,8 @@ fun DeviceScreen(
         Button(onClick = displayDeviceInfo, enabled = isDeviceConnected && foundTargetService) {
             Text("Display device information")
         }
-        if (password != null) {
-            var json = JSONObject(password)
+        if (deviceInfo != null) {
+            var json = JSONObject(deviceInfo)
             Text("Device information:\nDevice name: ${json.getString("device_name")}\nDevice model: ${json.getString("device_model")}\nBattery level: ${json.getString("battery_level")}")
         }
 //        Button(onClick = writeName, enabled = isDeviceConnected && foundTargetService) {
